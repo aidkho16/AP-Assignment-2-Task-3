@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+
+    <title>Intro to heatmap | Sample | ArcGIS Maps SDK for JavaScript 4.33</title>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.33/esri/themes/light/main.css" />
+
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+
+    <script src="https://js.arcgis.com/4.33/"></script>
+
+    <script type="module">
+      const [Map, CSVLayer, MapView, Legend] = await $arcgis.import([
+        "@arcgis/core/Map.js",
+        "@arcgis/core/layers/CSVLayer.js",
+        "@arcgis/core/views/MapView.js",
+        "@arcgis/core/widgets/Legend.js",
+      ]);
+
+      var url = "https://raw.githubusercontent.com/orhuna/WebGIS_SLU_M1/main/Module%202/stl_crime_wgs_84.csv";
+
+      const template = {
+   title: "Crime committed at {ILEADSStreet}"
+};
+
+      // The heatmap renderer assigns each pixel in the view with
+      // an intensity value. The ratio of that intensity value
+      // to the maxPixel intensity is used to assign a color
+      // from the continuous color ramp in the colorStops property
+
+      const renderer = {
+        type: "heatmap",
+        colorStops: [
+          { color: "rgba(63, 40, 102, 0)", ratio: 0 },
+          { color: "#ffee99ff", ratio: 0 },
+          { color: "#d4d94cff", ratio: 0.25 },
+          { color: "#77b46cff", ratio: 0.5 },
+          { color: "#3d8799ff", ratio: 0.75 },
+          { color: "#2b57d9ff", ratio: 1 },
+        ],
+        maxDensity: 0.01,
+        minDensity: 0,
+      };
+
+      const layer = new CSVLayer({
+        url: url,
+        title: "St. Louis Crime Heatmap",
+        copyright: "St. Louis Police Department",
+		latitudeField:"Lat",
+        longitudeField:"Lon",
+		popupTemplate: template,
+		renderer: renderer
+});
+
+      const map = new Map({
+        basemap: "gray-vector",
+        layers: [layer],
+      });
+
+      const view = new MapView({
+        container: "viewDiv",
+        center: [-90.20037, 38.63131],
+        zoom: 10,
+        map: map,
+      });
+
+      view.ui.add(
+        new Legend({
+          view: view,
+        }),
+        "bottom-left",
+      );
+    </script>
+  </head>
+
+  <body>
+    <div id="viewDiv"></div>
+  </body>
+</html>
